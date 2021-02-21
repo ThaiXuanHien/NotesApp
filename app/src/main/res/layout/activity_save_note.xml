@@ -146,8 +146,8 @@
                 android:textColor="@color/colorWhite"
                 android:textColorHint="@color/color_text_hint"
                 android:textSize="@dimen/_13ssp"
-                app:layout_constraintTop_toBottomOf="@id/edtNoteSubTitle"
-                app:layout_constraintBottom_toBottomOf="parent">
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/edtNoteSubTitle">
 
             </EditText>
 
@@ -155,4 +155,5 @@
 
     </ScrollView>
 
+    <include layout="@layout/options_color" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

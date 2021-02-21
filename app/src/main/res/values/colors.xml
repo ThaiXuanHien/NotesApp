@@ -22,5 +22,10 @@
     <color name="color_sub_title">#CECECE</color>
     <color name="color_bg_item_note">#333333</color>
     <color name="color_txt_subtitle_item_note">#FAFAFA</color>
+    <color name="color_bg_options_color">#C8C8C8</color>
+    <color name="color_2">#FDBE3B</color>
+    <color name="color_3">#FF4842</color>
+    <color name="color_4">#3A52fc</color>
+    <color name="color_5">#81DD17</color>
 
 </resources>

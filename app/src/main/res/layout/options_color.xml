@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layoutOptionsColor"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/color_bg_options_color"
+    android:orientation="vertical"
+    app:behavior_peekHeight="@dimen/_40sdp"
+    app:layout_behavior="@string/bottom_sheet_behavior">
+
+    <TextView
+        android:id="@+id/txtTitleChooseColor"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_40sdp"
+        android:fontFamily="@font/ubuntu_medium"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:text="@string/choose_color"
+        android:textColor="@color/colorWhite"
+        android:textSize="@dimen/_13ssp">
+
+    </TextView>
+
+    <LinearLayout
+        android:id="@+id/layoutColor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_10sdp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <View
+                android:id="@+id/viewColor1"
+                android:layout_width="@dimen/_35sdp"
+                android:layout_height="@dimen/_35sdp"
+                android:background="@drawable/bg_color_1"></View>
+
+            <ImageView
+                android:id="@+id/imgColor1"
+                android:layout_width="@dimen/_35sdp"
+                android:layout_height="@dimen/_35sdp"
+                android:padding="@dimen/_10sdp"
+                android:src="@drawable/ic_done"
+                app:tint="@color/colorWhite">
+
+            </ImageView>
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <View
+                android:id="@+id/viewColor2"
+                android:layout_width="@dimen/_35sdp"
+                android:layout_height="@dimen/_35sdp"
+                android:background="@drawable/bg_color_2">
+
+            </View>
+
+            <ImageView
+                android:id="@+id/imgColor2"
+                android:layout_width="@dimen/_35sdp"
+                android:layout_height="@dimen/_35sdp"
+                android:padding="@dimen/_10sdp"
+                app:tint="@color/colorWhite"></ImageView>
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <View
+                android:id="@+id/viewColor3"
+                android:layout_width="@dimen/_35sdp"
+                android:layout_height="@dimen/_35sdp"
+                android:background="@drawable/bg_color_3">
+
+            </View>
+
+            <ImageView
+                android:id="@+id/imgColor3"
+                android:layout_width="@dimen/_35sdp"
+                android:layout_height="@dimen/_35sdp"
+                android:padding="@dimen/_10sdp"
+                app:tint="@color/colorWhite"></ImageView>
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <View
+                android:id="@+id/viewColor4"
+                android:layout_width="@dimen/_35sdp"
+                android:layout_height="@dimen/_35sdp"
+                android:background="@drawable/bg_color_4">
+
+            </View>
+
+            <ImageView
+                android:id="@+id/imgColor4"
+                android:layout_width="@dimen/_35sdp"
+                android:layout_height="@dimen/_35sdp"
+                android:padding="@dimen/_10sdp"
+                app:tint="@color/colorWhite"></ImageView>
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <View
+                android:id="@+id/viewColor5"
+                android:layout_width="@dimen/_35sdp"
+                android:layout_height="@dimen/_35sdp"
+                android:background="@drawable/bg_color_5">
+
+            </View>
+
+            <ImageView
+                android:id="@+id/imgColor5"
+                android:layout_width="@dimen/_35sdp"
+                android:layout_height="@dimen/_35sdp"
+                android:padding="@dimen/_10sdp"
+                app:tint="@color/colorWhite"></ImageView>
+        </FrameLayout>
+
+    </LinearLayout>
+</LinearLayout>

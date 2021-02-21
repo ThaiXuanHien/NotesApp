@@ -1,8 +1,11 @@
 package com.hienthai.notesapp.adapters;
 
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -47,6 +50,15 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
         holder.txtTitleItemNote.setText(note.getTitle());
         holder.txtSubtitleItemNote.setText(note.getSubtitle());
         holder.txtDateTimeItemNote.setText(note.getDateTime());
+
+
+
+//        GradientDrawable gradientDrawable = (GradientDrawable) holder.layoutItemNote.getBackground();
+//        if (note.getColor() != null) {
+//            gradientDrawable.setColor(Color.parseColor(note.getColor()));
+//        } else {
+//            gradientDrawable.setColor(Color.parseColor("#333333"));
+//        }
     }
 
     @Override
@@ -65,12 +77,15 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
 
         TextView txtTitleItemNote, txtSubtitleItemNote, txtDateTimeItemNote;
 
+        LinearLayout layoutItemNote;
+
         public NoteViewHolder(@NonNull View itemView) {
             super(itemView);
 
             txtTitleItemNote = itemView.findViewById(R.id.txtTitleItemNote);
             txtSubtitleItemNote = itemView.findViewById(R.id.txtSubtitleItemNote);
             txtDateTimeItemNote = itemView.findViewById(R.id.txtDateTimeItemNote);
+            layoutItemNote = itemView.findViewById(R.id.layoutItemNote);
 
         }
     }

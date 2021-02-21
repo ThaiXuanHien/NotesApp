@@ -3,15 +3,19 @@ package com.hienthai.notesapp.activities;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.hienthai.notesapp.R;
 import com.hienthai.notesapp.database.NotesDatabase;
 import com.hienthai.notesapp.entities.Note;
@@ -28,6 +32,9 @@ public class SaveNoteActivity extends AppCompatActivity implements View.OnClickL
 
     private EditText edtNoteTitle, edtNoteSubTitle, edtContentNote;
     private TextView txtDateTime;
+    private View viewSubTitleIndicator;
+
+    private String selectedColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +51,12 @@ public class SaveNoteActivity extends AppCompatActivity implements View.OnClickL
         imgDone.setOnClickListener(this);
 
 
+        initOptionsColor();
+
+        selectedColor = "#333333";
+
+        //setColorSubtitleIndicator();
+
         Log.e(TAG, "onCreate");
     }
 
@@ -54,6 +67,7 @@ public class SaveNoteActivity extends AppCompatActivity implements View.OnClickL
         edtNoteSubTitle = findViewById(R.id.edtNoteSubTitle);
         edtContentNote = findViewById(R.id.edtContentNote);
         txtDateTime = findViewById(R.id.txtDateTime);
+        viewSubTitleIndicator = findViewById(R.id.viewSubTitleIndicator);
     }
 
 
@@ -72,7 +86,7 @@ public class SaveNoteActivity extends AppCompatActivity implements View.OnClickL
         note.setSubtitle(edtNoteSubTitle.getText().toString());
         note.setNoteText(edtContentNote.getText().toString());
         note.setDateTime(txtDateTime.getText().toString());
-
+        note.setColor(selectedColor);
 
         NotesDatabase.getInstance(this).noteDAO().insertNote(note);
 
@@ -82,6 +96,102 @@ public class SaveNoteActivity extends AppCompatActivity implements View.OnClickL
 
     }
 
+    private void initOptionsColor() {
+        LinearLayout layoutOptionsColor = findViewById(R.id.layoutOptionsColor);
+        BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(layoutOptionsColor);
+        layoutOptionsColor.findViewById(R.id.txtTitleChooseColor).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                } else {
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
+            }
+        });
+
+
+        ImageView imgColor1 = layoutOptionsColor.findViewById(R.id.imgColor1);
+        ImageView imgColor2 = layoutOptionsColor.findViewById(R.id.imgColor2);
+        ImageView imgColor3 = layoutOptionsColor.findViewById(R.id.imgColor3);
+        ImageView imgColor4 = layoutOptionsColor.findViewById(R.id.imgColor4);
+        ImageView imgColor5 = layoutOptionsColor.findViewById(R.id.imgColor5);
+
+        layoutOptionsColor.findViewById(R.id.viewColor1).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedColor = "#333333";
+                imgColor1.setImageResource(R.drawable.ic_done);
+                imgColor2.setImageResource(0);
+                imgColor3.setImageResource(0);
+                imgColor4.setImageResource(0);
+                imgColor5.setImageResource(0);
+
+                setColorSubtitleIndicator();
+            }
+        });
+
+        layoutOptionsColor.findViewById(R.id.viewColor2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedColor = "#FDBE3B";
+                imgColor1.setImageResource(0);
+                imgColor2.setImageResource(R.drawable.ic_done);
+                imgColor3.setImageResource(0);
+                imgColor4.setImageResource(0);
+                imgColor5.setImageResource(0);
+
+                setColorSubtitleIndicator();
+            }
+        });
+
+        layoutOptionsColor.findViewById(R.id.viewColor3).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedColor = "#FF4842";
+                imgColor1.setImageResource(0);
+                imgColor2.setImageResource(0);
+                imgColor3.setImageResource(R.drawable.ic_done);
+                imgColor4.setImageResource(0);
+                imgColor5.setImageResource(0);
+
+                setColorSubtitleIndicator();
+            }
+        });
+
+        layoutOptionsColor.findViewById(R.id.viewColor4).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedColor = "#3A52fc";
+                imgColor1.setImageResource(0);
+                imgColor2.setImageResource(0);
+                imgColor3.setImageResource(0);
+                imgColor4.setImageResource(R.drawable.ic_done);
+                imgColor5.setImageResource(0);
+
+                setColorSubtitleIndicator();
+            }
+        });
+
+        layoutOptionsColor.findViewById(R.id.viewColor1).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedColor = "#81DD17";
+                imgColor1.setImageResource(0);
+                imgColor2.setImageResource(0);
+                imgColor3.setImageResource(0);
+                imgColor4.setImageResource(0);
+                imgColor5.setImageResource(R.drawable.ic_done);
+
+                setColorSubtitleIndicator();
+            }
+        });
+    }
+
+    private void setColorSubtitleIndicator(){
+        GradientDrawable gradientDrawable = (GradientDrawable) viewSubTitleIndicator.getBackground();
+        gradientDrawable.setColor(Color.parseColor(selectedColor));
+    }
 
     @Override
     protected void onStart() {
