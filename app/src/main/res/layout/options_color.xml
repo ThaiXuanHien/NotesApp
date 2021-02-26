@@ -137,4 +137,70 @@
         </FrameLayout>
 
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutAddImage"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_35sdp"
+        android:layout_margin="@dimen/_10sdp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/imgChooseImage"
+            android:layout_width="@dimen/_22sdp"
+            android:layout_height="@dimen/_22sdp"
+            android:src="@drawable/ic_image"
+            app:tint="@color/color_icons">
+
+        </ImageView>
+
+        <ImageView
+            android:id="@+id/imgAddUrl"
+            android:layout_width="@dimen/_22sdp"
+            android:layout_height="@dimen/_22sdp"
+            android:layout_marginStart="@dimen/_15sdp"
+            android:layout_marginLeft="@dimen/_15sdp"
+            android:src="@drawable/ic_web_link"
+            app:tint="@color/color_icons">
+
+        </ImageView>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/layoutOptionDeleteNote"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_35sdp"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:layout_marginEnd="@dimen/_10sdp"
+        android:layout_marginBottom="@dimen/_10sdp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/imgDeleteNote"
+            android:layout_width="@dimen/_22sdp"
+            android:layout_height="@dimen/_22sdp"
+            android:src="@drawable/ic_delete"
+            app:tint="@color/color_delete">
+
+        </ImageView>
+
+        <TextView
+            android:textColor="@color/color_delete"
+            android:id="@+id/txtDeleteNote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginLeft="@dimen/_10sdp"
+            android:fontFamily="@font/ubuntu_medium"
+            android:includeFontPadding="false"
+            android:text="Delete Note"
+            android:textSize="@dimen/_12ssp">
+
+        </TextView>
+
+    </LinearLayout>
 </LinearLayout>

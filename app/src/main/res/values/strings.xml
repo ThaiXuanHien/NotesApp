@@ -6,4 +6,9 @@
     <string name="note_subtitle">Note SubTitle</string>
     <string name="type_note_here">Type Note Here ...</string>
     <string name="choose_color">Choose color</string>
+    <string name="add_url">Add Url</string>
+    <string name="enter_url">Enter Url</string>
+    <string name="add">ADD</string>
+    <string name="cancel">CANCEL</string>
+    <string name="delete_note">Delete Note</string>
 </resources>

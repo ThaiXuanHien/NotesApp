@@ -1,13 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/layoutItemNote"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="@dimen/_12sdp"
     android:layout_marginLeft="@dimen/_12sdp"
     android:layout_marginTop="@dimen/_12sdp"
-    android:background="@color/color_bg_item_note"
+    android:background="@drawable/bg_item_note"
     android:orientation="vertical">
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/imgItemNote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:visibility="gone"
+        app:riv_corner_radius_top_left="@dimen/_10sdp"
+        app:riv_corner_radius_top_right="@dimen/_10sdp">
+
+    </com.makeramen.roundedimageview.RoundedImageView>
 
     <TextView
         android:id="@+id/txtTitleItemNote"

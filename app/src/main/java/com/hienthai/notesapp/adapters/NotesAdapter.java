@@ -1,27 +1,37 @@
 package com.hienthai.notesapp.adapters;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hienthai.notesapp.R;
 import com.hienthai.notesapp.entities.Note;
+import com.hienthai.notesapp.listeners.NotesListener;
+import com.makeramen.roundedimageview.RoundedImageView;
+import com.squareup.picasso.Picasso;
 
+import java.io.InputStream;
 import java.util.List;
 
 public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
 
     private List<Note> noteList;
+    private NotesListener notesListener;
 
-    public NotesAdapter(List<Note> noteList) {
+    public NotesAdapter(List<Note> noteList, NotesListener notesListener) {
         this.noteList = noteList;
+        this.notesListener = notesListener;
     }
 
 
@@ -52,13 +62,29 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
         holder.txtDateTimeItemNote.setText(note.getDateTime());
 
 
+        if (note.getColor() != null) {
+            holder.layoutItemNote.setBackgroundColor(Color.parseColor(note.getColor()));
+        } else {
+            holder.layoutItemNote.setBackgroundColor(Color.parseColor("#333333"));
+        }
 
-//        GradientDrawable gradientDrawable = (GradientDrawable) holder.layoutItemNote.getBackground();
-//        if (note.getColor() != null) {
-//            gradientDrawable.setColor(Color.parseColor(note.getColor()));
-//        } else {
-//            gradientDrawable.setColor(Color.parseColor("#333333"));
-//        }
+
+        if (note.getImagePath() != null) {
+            holder.imgItemNote.setImageBitmap(BitmapFactory.decodeFile(note.getImagePath()));
+
+
+            holder.imgItemNote.setVisibility(View.VISIBLE);
+        } else {
+            holder.imgItemNote.setVisibility(View.GONE);
+        }
+
+
+        holder.layoutItemNote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                notesListener.onNoteClicked(note, position);
+            }
+        });
     }
 
     @Override
@@ -79,6 +105,8 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
 
         LinearLayout layoutItemNote;
 
+        RoundedImageView imgItemNote;
+
         public NoteViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -86,7 +114,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
             txtSubtitleItemNote = itemView.findViewById(R.id.txtSubtitleItemNote);
             txtDateTimeItemNote = itemView.findViewById(R.id.txtDateTimeItemNote);
             layoutItemNote = itemView.findViewById(R.id.layoutItemNote);
-
+            imgItemNote = itemView.findViewById(R.id.imgItemNote);
         }
     }
 }

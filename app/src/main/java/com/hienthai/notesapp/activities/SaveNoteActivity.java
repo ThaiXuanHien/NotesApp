@@ -1,14 +1,34 @@
 package com.hienthai.notesapp.activities;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
+import android.util.Patterns;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -20,6 +40,8 @@ import com.hienthai.notesapp.R;
 import com.hienthai.notesapp.database.NotesDatabase;
 import com.hienthai.notesapp.entities.Note;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -27,14 +49,23 @@ import java.util.Locale;
 public class SaveNoteActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = SaveNoteActivity.class.getName();
+    private static final int REQUEST_CODE_STORAGE_CAMERA = 1;
+    private static final int REQUEST_CODE_SELECT_IMAGE = 2;
 
-    private ImageView imgBack, imgDone;
+    private ImageView imgBack, imgDone, imgNote;
 
     private EditText edtNoteTitle, edtNoteSubTitle, edtContentNote;
-    private TextView txtDateTime;
+    private TextView txtDateTime, txtUrl;
     private View viewSubTitleIndicator;
 
-    private String selectedColor;
+    private LinearLayout layoutUrl;
+
+    private AlertDialog addUrlDialog, deleteNoteDialog;
+
+
+    private String selectedColor, selectedImagePath;
+
+    private Note dataNote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,13 +82,60 @@ public class SaveNoteActivity extends AppCompatActivity implements View.OnClickL
         imgDone.setOnClickListener(this);
 
 
-        initOptionsColor();
-
         selectedColor = "#333333";
+        selectedImagePath = "";
 
-        //setColorSubtitleIndicator();
+        if (getIntent().getBooleanExtra("isViewOrUpdate", false)) {
+            dataNote = (Note) getIntent().getSerializableExtra("note");
+
+            setViewOrUpdateNote();
+        }
+
+        findViewById(R.id.imgDeleteUrl).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                txtUrl.setText(null);
+                layoutUrl.setVisibility(View.GONE);
+            }
+        });
+
+        findViewById(R.id.imgDeleteIamge).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imgNote.setImageBitmap(null);
+                imgNote.setVisibility(View.GONE);
+                findViewById(R.id.imgDeleteIamge).setVisibility(View.GONE);
+
+                selectedImagePath = "";
+            }
+        });
+
+
+        initOptionsColor();
+        setColorSubtitleIndicator();
+
 
         Log.e(TAG, "onCreate");
+    }
+
+    private void setViewOrUpdateNote() {
+        edtNoteTitle.setText(dataNote.getTitle());
+        edtNoteSubTitle.setText(dataNote.getSubtitle());
+        edtContentNote.setText(dataNote.getNoteText());
+        txtDateTime.setText(dataNote.getDateTime());
+
+        if (dataNote.getImagePath() != null && !dataNote.getImagePath().trim().isEmpty()) {
+            imgNote.setImageBitmap(BitmapFactory.decodeFile(dataNote.getImagePath()));
+            imgNote.setVisibility(View.VISIBLE);
+            findViewById(R.id.imgDeleteIamge).setVisibility(View.VISIBLE);
+
+            selectedImagePath = dataNote.getImagePath();
+        }
+
+        if (dataNote.getWebLink() != null && !dataNote.getWebLink().trim().isEmpty()) {
+            txtUrl.setText(dataNote.getWebLink());
+            layoutUrl.setVisibility(View.VISIBLE);
+        }
     }
 
     private void anhXa() {
@@ -68,6 +146,11 @@ public class SaveNoteActivity extends AppCompatActivity implements View.OnClickL
         edtContentNote = findViewById(R.id.edtContentNote);
         txtDateTime = findViewById(R.id.txtDateTime);
         viewSubTitleIndicator = findViewById(R.id.viewSubTitleIndicator);
+
+        imgNote = findViewById(R.id.imgNote);
+
+        txtUrl = findViewById(R.id.txtUrl);
+        layoutUrl = findViewById(R.id.layoutUrl);
     }
 
 
@@ -87,6 +170,15 @@ public class SaveNoteActivity extends AppCompatActivity implements View.OnClickL
         note.setNoteText(edtContentNote.getText().toString());
         note.setDateTime(txtDateTime.getText().toString());
         note.setColor(selectedColor);
+        note.setImagePath(selectedImagePath);
+
+        if (layoutUrl.getVisibility() == View.VISIBLE) {
+            note.setWebLink(txtUrl.getText().toString());
+        }
+
+        if (dataNote != null) {
+            note.setId(dataNote.getId());
+        }
 
         NotesDatabase.getInstance(this).noteDAO().insertNote(note);
 
@@ -162,7 +254,7 @@ public class SaveNoteActivity extends AppCompatActivity implements View.OnClickL
         layoutOptionsColor.findViewById(R.id.viewColor4).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectedColor = "#3A52fc";
+                selectedColor = "#3A52FC";
                 imgColor1.setImageResource(0);
                 imgColor2.setImageResource(0);
                 imgColor3.setImageResource(0);
@@ -173,7 +265,8 @@ public class SaveNoteActivity extends AppCompatActivity implements View.OnClickL
             }
         });
 
-        layoutOptionsColor.findViewById(R.id.viewColor1).setOnClickListener(new View.OnClickListener() {
+
+        layoutOptionsColor.findViewById(R.id.viewColor5).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 selectedColor = "#81DD17";
@@ -186,12 +279,237 @@ public class SaveNoteActivity extends AppCompatActivity implements View.OnClickL
                 setColorSubtitleIndicator();
             }
         });
+
+        if (dataNote != null && dataNote.getColor() != null && !dataNote.getColor().trim().isEmpty()) {
+            switch (dataNote.getColor()) {
+
+                case "#FDBE3B":
+                    layoutOptionsColor.findViewById(R.id.viewColor2).performClick();
+
+                    break;
+                case "#FF4842":
+                    layoutOptionsColor.findViewById(R.id.viewColor3).performClick();
+                    break;
+                case "#3A52FC":
+                    layoutOptionsColor.findViewById(R.id.viewColor4).performClick();
+                    break;
+                case "#81DD17":
+                    layoutOptionsColor.findViewById(R.id.viewColor5).performClick();
+                    break;
+
+            }
+        }
+
+
+        layoutOptionsColor.findViewById(R.id.imgChooseImage).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                if (ContextCompat.checkSelfPermission(
+                        getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(SaveNoteActivity.this, new String[]
+                            {Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_STORAGE_CAMERA);
+                } else {
+                    selectImage();
+                }
+            }
+        });
+
+        layoutOptionsColor.findViewById(R.id.imgAddUrl).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                showDialog();
+            }
+        });
+
+        if (dataNote != null) {
+            layoutOptionsColor.findViewById(R.id.layoutOptionDeleteNote).setVisibility(View.VISIBLE);
+            layoutOptionsColor.findViewById(R.id.layoutOptionDeleteNote).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    showDeleteNoteDialog();
+                }
+            });
+        }
+
     }
 
-    private void setColorSubtitleIndicator(){
-        GradientDrawable gradientDrawable = (GradientDrawable) viewSubTitleIndicator.getBackground();
-        gradientDrawable.setColor(Color.parseColor(selectedColor));
+    private void showDeleteNoteDialog() {
+        if (deleteNoteDialog == null) {
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(SaveNoteActivity.this);
+
+            View view = LayoutInflater.from(this).inflate(R.layout.layout_delete_note, (ViewGroup) findViewById(R.id.deleteNoteDialog));
+
+            builder.setView(view);
+
+            deleteNoteDialog = builder.create();
+
+            if (deleteNoteDialog.getWindow() != null) {
+                deleteNoteDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            }
+
+
+            view.findViewById(R.id.txtDeleteNoteDialog).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    NotesDatabase.getInstance(getApplicationContext()).noteDAO().deleteNote(dataNote);
+
+                    Intent intent = new Intent();
+
+                    setResult(RESULT_OK, intent);
+
+                    deleteNoteDialog.dismiss();
+
+                    finish();
+                }
+            });
+
+            view.findViewById(R.id.txtCancelDialog).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    deleteNoteDialog.dismiss();
+                }
+            });
+
+
+        }
+
+        deleteNoteDialog.show();
     }
+
+    private void selectImage() {
+
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(intent, REQUEST_CODE_SELECT_IMAGE);
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_CODE_STORAGE_CAMERA && grantResults.length > 0) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                selectImage();
+            } else {
+                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void setColorSubtitleIndicator() {
+
+        viewSubTitleIndicator.setBackgroundColor(Color.parseColor(selectedColor));
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE_SELECT_IMAGE && resultCode == RESULT_OK) {
+            if (data != null) {
+
+                Uri imageSelected = data.getData();
+                if (imageSelected != null) {
+                    try {
+                        InputStream inputStream = getContentResolver().openInputStream(imageSelected);
+
+                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        imgNote.setImageBitmap(bitmap);
+                        imgNote.setVisibility(View.VISIBLE);
+                        findViewById(R.id.imgDeleteIamge).setVisibility(View.VISIBLE);
+
+
+                        selectedImagePath = getPathFromUri(imageSelected);
+
+
+                        Toast.makeText(this, "" + selectedImagePath, Toast.LENGTH_SHORT).show();
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+
+    private String getPathFromUri(Uri contentUri) {
+        String filePath;
+
+        Cursor cursor = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            cursor = getContentResolver().query(contentUri, null, null, null, null);
+        }
+        if (cursor == null) {
+            filePath = contentUri.getPath();
+        } else {
+            cursor.moveToFirst();
+
+            int index = cursor.getColumnIndex("_data");
+
+            filePath = cursor.getString(index);
+            cursor.close();
+        }
+
+        return filePath;
+    }
+
+    private void showDialog() {
+        if (addUrlDialog == null) {
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(SaveNoteActivity.this);
+
+            View view = LayoutInflater.from(this).inflate(R.layout.layout_add_url, (ViewGroup) findViewById(R.id.layoutAddUrl));
+
+            builder.setView(view);
+
+            addUrlDialog = builder.create();
+
+            if (addUrlDialog.getWindow() != null) {
+                addUrlDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            }
+
+            EditText edtUrl = view.findViewById(R.id.edtAddUrl);
+            edtUrl.requestFocus();
+
+            view.findViewById(R.id.txtAdd).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (edtUrl.getText().toString().trim().isEmpty()) {
+                        Toast.makeText(SaveNoteActivity.this, "Url Empty!", Toast.LENGTH_SHORT).show();
+
+                    } else if (!Patterns.WEB_URL.matcher(edtUrl.getText().toString()).matches()) {
+                        Toast.makeText(SaveNoteActivity.this, "Url invalid!", Toast.LENGTH_SHORT).show();
+
+                    } else {
+                        txtUrl.setText(edtUrl.getText().toString());
+                        layoutUrl.setVisibility(View.VISIBLE);
+
+                        addUrlDialog.dismiss();
+                    }
+                }
+            });
+
+            view.findViewById(R.id.txtCancel).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    addUrlDialog.dismiss();
+                }
+            });
+
+
+        }
+
+        addUrlDialog.show();
+    }
+
 
     @Override
     protected void onStart() {
