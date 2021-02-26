@@ -7,8 +7,11 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -30,12 +33,11 @@ public class MainActivity extends AppCompatActivity implements NotesListener {
 
     private ImageView imgAddNoteMain;
     private RecyclerView rcvNotes;
+    private EditText edtSearch;
 
     private List<Note> noteList;
     private NotesAdapter notesAdapter;
 
-
-    private int noteClickedPosition = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +57,27 @@ public class MainActivity extends AppCompatActivity implements NotesListener {
         loadDataNotes();
 
 
+        edtSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                notesAdapter.cancelTimer();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (noteList.size() != 0) {
+                    notesAdapter.searchNote(s.toString());
+
+                }
+            }
+        });
+
+
         Log.e(TAG, "onCreate");
 
     }
@@ -69,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements NotesListener {
         imgAddNoteMain = findViewById(R.id.imgAddNoteMain);
         rcvNotes = findViewById(R.id.rcvNotes);
         rcvNotes.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        edtSearch = findViewById(R.id.edtSearch);
 
         noteList = new ArrayList<>();
 
@@ -133,7 +157,6 @@ public class MainActivity extends AppCompatActivity implements NotesListener {
     @Override
     public void onNoteClicked(Note note, int position) {
 
-        noteClickedPosition = position;
 
         Intent intent = new Intent(this, SaveNoteActivity.class);
         intent.putExtra("isViewOrUpdate", true);
