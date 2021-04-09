@@ -46,12 +46,7 @@ public class MainActivity extends AppCompatActivity implements NotesListener {
 
         anhXa();
 
-        imgAddNoteMain.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivityForResult(new Intent(MainActivity.this, SaveNoteActivity.class), REQUEST_CODE_ADD_NOTE);
-            }
-        });
+        imgAddNoteMain.setOnClickListener(v -> startActivityForResult(new Intent(MainActivity.this, SaveNoteActivity.class), REQUEST_CODE_ADD_NOTE));
 
 
         loadDataNotes();

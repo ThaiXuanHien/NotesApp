@@ -220,5 +220,5 @@
 
     </ScrollView>
 
-    <include layout="@layout/options_color" />
+    <include layout="@layout/options_layout" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

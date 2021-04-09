@@ -1,31 +1,15 @@
 package com.hienthai.notesapp.activities;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.ContentUris;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.util.Patterns;
@@ -38,7 +22,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.TedPermission;
 import com.hienthai.notesapp.R;
 import com.hienthai.notesapp.database.NotesDatabase;
 import com.hienthai.notesapp.entities.Note;
@@ -51,13 +43,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+
+import gun0912.tedimagepicker.builder.TedImagePicker;
+import gun0912.tedimagepicker.builder.listener.OnSelectedListener;
 
 public class SaveNoteActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = SaveNoteActivity.class.getName();
-    private static final int REQUEST_CODE_STORAGE_CAMERA = 1;
-    private static final int REQUEST_CODE_SELECT_IMAGE = 2;
+//    private static final int REQUEST_CODE_STORAGE_CAMERA = 1;
+//    private static final int REQUEST_CODE_SELECT_IMAGE = 2;
 
     private ImageView imgBack, imgDone, imgNote;
 
@@ -98,27 +94,21 @@ public class SaveNoteActivity extends AppCompatActivity implements View.OnClickL
             setViewOrUpdateNote();
         }
 
-        findViewById(R.id.imgDeleteUrl).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                txtUrl.setText(null);
-                layoutUrl.setVisibility(View.GONE);
-            }
+        findViewById(R.id.imgDeleteUrl).setOnClickListener(v -> {
+            txtUrl.setText(null);
+            layoutUrl.setVisibility(View.GONE);
         });
 
-        findViewById(R.id.imgDeleteIamge).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                imgNote.setImageBitmap(null);
-                imgNote.setVisibility(View.GONE);
-                findViewById(R.id.imgDeleteIamge).setVisibility(View.GONE);
+        findViewById(R.id.imgDeleteIamge).setOnClickListener(v -> {
+            imgNote.setImageBitmap(null);
+            imgNote.setVisibility(View.GONE);
+            findViewById(R.id.imgDeleteIamge).setVisibility(View.GONE);
 
-                selectedImagePath = "";
-            }
+            selectedImagePath = "";
         });
 
 
-        initOptionsColor();
+        initOptionsLayout();
         setColorSubtitleIndicator();
 
 
@@ -132,7 +122,7 @@ public class SaveNoteActivity extends AppCompatActivity implements View.OnClickL
         txtDateTime.setText(dataNote.getDateTime());
 
         if (dataNote.getImagePath() != null && !dataNote.getImagePath().trim().isEmpty()) {
-            imgNote.setImageBitmap(BitmapFactory.decodeFile(dataNote.getImagePath()));
+            imgNote.setImageURI(Uri.parse(dataNote.getImagePath()));
             imgNote.setVisibility(View.VISIBLE);
             findViewById(R.id.imgDeleteIamge).setVisibility(View.VISIBLE);
 
@@ -195,10 +185,10 @@ public class SaveNoteActivity extends AppCompatActivity implements View.OnClickL
 
     }
 
-    private void initOptionsColor() {
-        LinearLayout layoutOptionsColor = findViewById(R.id.layoutOptionsColor);
-        BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(layoutOptionsColor);
-        layoutOptionsColor.findViewById(R.id.txtTitleChooseColor).setOnClickListener(new View.OnClickListener() {
+    private void initOptionsLayout() {
+        LinearLayout layoutOptions = findViewById(R.id.layoutOptions);
+        BottomSheetBehavior<LinearLayout> bottomSheetBehavior = BottomSheetBehavior.from(layoutOptions);
+        layoutOptions.findViewById(R.id.txtTitleChooseColor).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
@@ -210,13 +200,13 @@ public class SaveNoteActivity extends AppCompatActivity implements View.OnClickL
         });
 
 
-        ImageView imgColor1 = layoutOptionsColor.findViewById(R.id.imgColor1);
-        ImageView imgColor2 = layoutOptionsColor.findViewById(R.id.imgColor2);
-        ImageView imgColor3 = layoutOptionsColor.findViewById(R.id.imgColor3);
-        ImageView imgColor4 = layoutOptionsColor.findViewById(R.id.imgColor4);
-        ImageView imgColor5 = layoutOptionsColor.findViewById(R.id.imgColor5);
+        ImageView imgColor1 = layoutOptions.findViewById(R.id.imgColor1);
+        ImageView imgColor2 = layoutOptions.findViewById(R.id.imgColor2);
+        ImageView imgColor3 = layoutOptions.findViewById(R.id.imgColor3);
+        ImageView imgColor4 = layoutOptions.findViewById(R.id.imgColor4);
+        ImageView imgColor5 = layoutOptions.findViewById(R.id.imgColor5);
 
-        layoutOptionsColor.findViewById(R.id.viewColor1).setOnClickListener(new View.OnClickListener() {
+        layoutOptions.findViewById(R.id.viewColor1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 selectedColor = "#333333";
@@ -230,7 +220,7 @@ public class SaveNoteActivity extends AppCompatActivity implements View.OnClickL
             }
         });
 
-        layoutOptionsColor.findViewById(R.id.viewColor2).setOnClickListener(new View.OnClickListener() {
+        layoutOptions.findViewById(R.id.viewColor2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 selectedColor = "#FDBE3B";
@@ -244,7 +234,7 @@ public class SaveNoteActivity extends AppCompatActivity implements View.OnClickL
             }
         });
 
-        layoutOptionsColor.findViewById(R.id.viewColor3).setOnClickListener(new View.OnClickListener() {
+        layoutOptions.findViewById(R.id.viewColor3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 selectedColor = "#FF4842";
@@ -258,7 +248,7 @@ public class SaveNoteActivity extends AppCompatActivity implements View.OnClickL
             }
         });
 
-        layoutOptionsColor.findViewById(R.id.viewColor4).setOnClickListener(new View.OnClickListener() {
+        layoutOptions.findViewById(R.id.viewColor4).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 selectedColor = "#3A52FC";
@@ -273,7 +263,7 @@ public class SaveNoteActivity extends AppCompatActivity implements View.OnClickL
         });
 
 
-        layoutOptionsColor.findViewById(R.id.viewColor5).setOnClickListener(new View.OnClickListener() {
+        layoutOptions.findViewById(R.id.viewColor5).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 selectedColor = "#81DD17";
@@ -291,39 +281,41 @@ public class SaveNoteActivity extends AppCompatActivity implements View.OnClickL
             switch (dataNote.getColor()) {
 
                 case "#FDBE3B":
-                    layoutOptionsColor.findViewById(R.id.viewColor2).performClick();
+                    layoutOptions.findViewById(R.id.viewColor2).performClick();
 
                     break;
                 case "#FF4842":
-                    layoutOptionsColor.findViewById(R.id.viewColor3).performClick();
+                    layoutOptions.findViewById(R.id.viewColor3).performClick();
                     break;
                 case "#3A52FC":
-                    layoutOptionsColor.findViewById(R.id.viewColor4).performClick();
+                    layoutOptions.findViewById(R.id.viewColor4).performClick();
                     break;
                 case "#81DD17":
-                    layoutOptionsColor.findViewById(R.id.viewColor5).performClick();
+                    layoutOptions.findViewById(R.id.viewColor5).performClick();
                     break;
 
             }
         }
 
 
-        layoutOptionsColor.findViewById(R.id.imgChooseImage).setOnClickListener(new View.OnClickListener() {
+        layoutOptions.findViewById(R.id.imgChooseImage).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                if (ContextCompat.checkSelfPermission(
-                        getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(SaveNoteActivity.this, new String[]
-                            {Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_STORAGE_CAMERA);
-                } else {
-                    selectImage();
-                }
+//                if (ContextCompat.checkSelfPermission(
+//                        getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
+//                        != PackageManager.PERMISSION_GRANTED) {
+//                    ActivityCompat.requestPermissions(SaveNoteActivity.this, new String[]
+//                            {Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_STORAGE_CAMERA);
+//                } else {
+//                    selectImage();
+//                }
+
+                requestPermissions();
             }
         });
 
-        layoutOptionsColor.findViewById(R.id.imgAddUrl).setOnClickListener(new View.OnClickListener() {
+        layoutOptions.findViewById(R.id.imgAddUrl).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
@@ -332,8 +324,8 @@ public class SaveNoteActivity extends AppCompatActivity implements View.OnClickL
         });
 
         if (dataNote != null) {
-            layoutOptionsColor.findViewById(R.id.layoutOptionDeleteNote).setVisibility(View.VISIBLE);
-            layoutOptionsColor.findViewById(R.id.layoutOptionDeleteNote).setOnClickListener(new View.OnClickListener() {
+            layoutOptions.findViewById(R.id.layoutOptionDeleteNote).setVisibility(View.VISIBLE);
+            layoutOptions.findViewById(R.id.layoutOptionDeleteNote).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
@@ -342,6 +334,49 @@ public class SaveNoteActivity extends AppCompatActivity implements View.OnClickL
             });
         }
 
+    }
+
+    private void requestPermissions() {
+
+        PermissionListener permissionlistener = new PermissionListener() {
+            @Override
+            public void onPermissionGranted() {
+
+                Toast.makeText(SaveNoteActivity.this, "Permission Granted", Toast.LENGTH_SHORT).show();
+
+                openImagePicker();
+
+            }
+
+            @Override
+            public void onPermissionDenied(List<String> deniedPermissions) {
+                Toast.makeText(SaveNoteActivity.this, "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
+            }
+
+        };
+
+        TedPermission.with(this)
+                .setPermissionListener(permissionlistener)
+                .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
+                .setPermissions(Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE)
+                .check();
+    }
+
+    private void openImagePicker() {
+        TedImagePicker.with(this)
+                .start(new OnSelectedListener() {
+                    @Override
+                    public void onSelected(Uri uri) {
+                        showSingleImage(uri);
+                    }
+                });
+    }
+
+    private void showSingleImage(Uri uri) {
+        imgNote.setImageURI(uri);
+        imgNote.setVisibility(View.VISIBLE);
+        findViewById(R.id.imgDeleteIamge).setVisibility(View.VISIBLE);
+        selectedImagePath = uri.toString();
     }
 
     private void showDeleteNoteDialog() {
@@ -388,27 +423,27 @@ public class SaveNoteActivity extends AppCompatActivity implements View.OnClickL
         deleteNoteDialog.show();
     }
 
-    private void selectImage() {
+//    private void selectImage() {
+//
+//        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//        if (intent.resolveActivity(getPackageManager()) != null) {
+//            startActivityForResult(intent, REQUEST_CODE_SELECT_IMAGE);
+//        }
+//
+//    }
 
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(intent, REQUEST_CODE_SELECT_IMAGE);
-        }
-
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == REQUEST_CODE_STORAGE_CAMERA && grantResults.length > 0) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                selectImage();
-            } else {
-                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//
+//        if (requestCode == REQUEST_CODE_STORAGE_CAMERA && grantResults.length > 0) {
+//            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                selectImage();
+//            } else {
+//                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+//            }
+//        }
+//    }
 
     private void setColorSubtitleIndicator() {
 
@@ -419,238 +454,89 @@ public class SaveNoteActivity extends AppCompatActivity implements View.OnClickL
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == REQUEST_CODE_SELECT_IMAGE && resultCode == RESULT_OK) {
-            if (data != null) {
-
-                Uri imageSelected = data.getData();
-                if (imageSelected != null) {
-                    try {
-                        InputStream inputStream = getContentResolver().openInputStream(imageSelected);
-
-                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                        imgNote.setImageBitmap(bitmap);
-                        imgNote.setVisibility(View.VISIBLE);
-                        findViewById(R.id.imgDeleteIamge).setVisibility(View.VISIBLE);
-
-
-                        //selectedImagePath = getPathFromUri(this,imageSelected);
-                        selectedImagePath = getImagePathFromInputStreamUri(imageSelected);
-
-
-
-                        Toast.makeText(this, "" + selectedImagePath, Toast.LENGTH_SHORT).show();
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-    }
-
-    public String getImagePathFromInputStreamUri(Uri uri) {
-        InputStream inputStream = null;
-        String filePath = null;
-
-        if (uri.getAuthority() != null) {
-            try {
-                inputStream = getContentResolver().openInputStream(uri); // context needed
-                File photoFile = createTemporalFileFrom(inputStream);
-
-                filePath = photoFile.getPath();
-
-            } catch (FileNotFoundException e) {
-                // log
-            } catch (IOException e) {
-                // log
-            }finally {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return filePath;
-    }
-
-    private File createTemporalFileFrom(InputStream inputStream) throws IOException {
-        File targetFile = null;
-
-        if (inputStream != null) {
-            int read;
-            byte[] buffer = new byte[8 * 1024];
-
-            targetFile = createTemporalFile();
-            OutputStream outputStream = new FileOutputStream(targetFile);
-
-            while ((read = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, read);
-            }
-            outputStream.flush();
-
-            try {
-                outputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return targetFile;
-    }
-
-    private File createTemporalFile() {
-        return new File(getExternalCacheDir(), "tempFile.jpg"); // context needed
-    }
-
-//    public static String getPathFromUri(final Context context, final Uri uri) {
+//        if (requestCode == REQUEST_CODE_SELECT_IMAGE && resultCode == RESULT_OK) {
+//            if (data != null) {
 //
-//        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+//                Uri imageSelected = data.getData();
+//                if (imageSelected != null) {
+//                    try {
+//                        InputStream inputStream = getContentResolver().openInputStream(imageSelected);
 //
-//        // DocumentProvider
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-//            if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
-//                // ExternalStorageProvider
-//                if (isExternalStorageDocument(uri)) {
-//                    final String docId = DocumentsContract.getDocumentId(uri);
-//                    final String[] split = docId.split(":");
-//                    final String type = split[0];
+//                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+//                        imgNote.setImageBitmap(bitmap);
+//                        imgNote.setVisibility(View.VISIBLE);
+//                        findViewById(R.id.imgDeleteIamge).setVisibility(View.VISIBLE);
 //
-//                    if ("primary".equalsIgnoreCase(type)) {
-//                        return Environment.getExternalStorageDirectory() + "/" + split[1];
+//
+//                        selectedImagePath = getImagePathFromInputStreamUri(imageSelected);
+//
+//                        System.out.println(selectedImagePath);
+//
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
 //                    }
-//
-//                    // TODO handle non-primary volumes
-//                }
-//                // DownloadsProvider
-//                else if (isDownloadsDocument(uri)) {
-//
-//                    final String id = DocumentsContract.getDocumentId(uri);
-//                    final Uri contentUri = ContentUris.withAppendedId(
-//                            Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
-//
-//                    return getDataColumn(context, contentUri, null, null);
-//                }
-//                // MediaProvider
-//                else if (isMediaDocument(uri)) {
-//                    final String docId = DocumentsContract.getDocumentId(uri);
-//                    final String[] split = docId.split(":");
-//                    final String type = split[0];
-//
-//                    Uri contentUri = null;
-//                    if ("image".equals(type)) {
-//                        contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-//                    } else if ("video".equals(type)) {
-//                        contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-//                    } else if ("audio".equals(type)) {
-//                        contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-//                    }
-//
-//                    final String selection = "_id=?";
-//                    final String[] selectionArgs = new String[] {
-//                            split[1]
-//                    };
-//
-//                    return getDataColumn(context, contentUri, selection, selectionArgs);
 //                }
 //            }
-//            // MediaStore (and general)
-//            else if ("content".equalsIgnoreCase(uri.getScheme())) {
+//        }
+    }
+
+
+//    public String getImagePathFromInputStreamUri(Uri uri) {
+//        InputStream inputStream = null;
+//        String filePath = null;
 //
-//                // Return the remote address
-//                if (isGooglePhotosUri(uri))
-//                    return uri.getLastPathSegment();
+//        if (uri.getAuthority() != null) {
+//            try {
+//                inputStream = getContentResolver().openInputStream(uri); // context needed
+//                File photoFile = createTemporalFileFrom(inputStream);
 //
-//                return getDataColumn(context, uri, null, null);
-//            }
-//            // File
-//            else if ("file".equalsIgnoreCase(uri.getScheme())) {
-//                return uri.getPath();
+//                filePath = photoFile.getPath();
+//
+//            } catch (FileNotFoundException e) {
+//                // log
+//            } catch (IOException e) {
+//                // log
+//            } finally {
+//                try {
+//                    inputStream.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
 //            }
 //        }
 //
-//        return null;
+//        return filePath;
 //    }
 //
-//    public static String getDataColumn(Context context, Uri uri, String selection,
-//                                       String[] selectionArgs) {
+//    private File createTemporalFileFrom(InputStream inputStream) throws IOException {
+//        File targetFile = null;
 //
-//        Cursor cursor = null;
-//        final String column = "_data";
-//        final String[] projection = {
-//                column
-//        };
+//        if (inputStream != null) {
+//            int read;
+//            byte[] buffer = new byte[8 * 1024];
 //
-//        try {
-//            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
-//                    null);
-//            if (cursor != null && cursor.moveToFirst()) {
-//                final int index = cursor.getColumnIndexOrThrow(column);
-//                return cursor.getString(index);
+//            targetFile = createTemporalFile();
+//            OutputStream outputStream = new FileOutputStream(targetFile);
+//
+//            while ((read = inputStream.read(buffer)) != -1) {
+//                outputStream.write(buffer, 0, read);
 //            }
-//        } finally {
-//            if (cursor != null)
-//                cursor.close();
+//            outputStream.flush();
+//
+//            try {
+//                outputStream.close();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
 //        }
-//        return null;
+//
+//        return targetFile;
 //    }
 //
-//
-//    /**
-//     * @param uri The Uri to check.
-//     * @return Whether the Uri authority is ExternalStorageProvider.
-//     */
-//    public static boolean isExternalStorageDocument(Uri uri) {
-//        return "com.android.externalstorage.documents".equals(uri.getAuthority());
-//    }
-//
-//    /**
-//     * @param uri The Uri to check.
-//     * @return Whether the Uri authority is DownloadsProvider.
-//     */
-//    public static boolean isDownloadsDocument(Uri uri) {
-//        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
-//    }
-//
-//    /**
-//     * @param uri The Uri to check.
-//     * @return Whether the Uri authority is MediaProvider.
-//     */
-//    public static boolean isMediaDocument(Uri uri) {
-//        return "com.android.providers.media.documents".equals(uri.getAuthority());
-//    }
-//
-//    /**
-//     * @param uri The Uri to check.
-//     * @return Whether the Uri authority is Google Photos.
-//     */
-//    public static boolean isGooglePhotosUri(Uri uri) {
-//        return "content://com.google.android.apps.photos.content".equals(uri.getAuthority());
+//    private File createTemporalFile() {
+//        return new File(getExternalCacheDir(), "tempFile.jpg"); // context needed
 //    }
 
-
-
-    /*private String getPathFromUri(Uri contentUri) {
-        String filePath;
-
-        Cursor cursor = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            cursor = getContentResolver().query(contentUri, null, null, null, null);
-        }
-        if (cursor == null) {
-            filePath = contentUri.getPath();
-        } else {
-            cursor.moveToFirst();
-
-            int index = cursor.getColumnIndex("_data");
-
-            filePath = cursor.getString(index);
-            cursor.close();
-        }
-
-        return filePath;
-    }*/
 
     private void showDialog() {
         if (addUrlDialog == null) {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/layoutOptionsColor"
+    android:id="@+id/layoutOptions"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/color_bg_options_color"
@@ -39,7 +39,7 @@
                 android:id="@+id/viewColor1"
                 android:layout_width="@dimen/_35sdp"
                 android:layout_height="@dimen/_35sdp"
-                android:background="@drawable/bg_color_1"></View>
+                android:background="@drawable/bg_color_1"/>
 
             <ImageView
                 android:id="@+id/imgColor1"
@@ -70,7 +70,7 @@
                 android:layout_width="@dimen/_35sdp"
                 android:layout_height="@dimen/_35sdp"
                 android:padding="@dimen/_10sdp"
-                app:tint="@color/colorWhite"></ImageView>
+                app:tint="@color/colorWhite"/>
         </FrameLayout>
 
         <FrameLayout
@@ -91,7 +91,7 @@
                 android:layout_width="@dimen/_35sdp"
                 android:layout_height="@dimen/_35sdp"
                 android:padding="@dimen/_10sdp"
-                app:tint="@color/colorWhite"></ImageView>
+                app:tint="@color/colorWhite"/>
         </FrameLayout>
 
         <FrameLayout
@@ -112,7 +112,7 @@
                 android:layout_width="@dimen/_35sdp"
                 android:layout_height="@dimen/_35sdp"
                 android:padding="@dimen/_10sdp"
-                app:tint="@color/colorWhite"></ImageView>
+                app:tint="@color/colorWhite"/>
         </FrameLayout>
 
         <FrameLayout
@@ -133,7 +133,7 @@
                 android:layout_width="@dimen/_35sdp"
                 android:layout_height="@dimen/_35sdp"
                 android:padding="@dimen/_10sdp"
-                app:tint="@color/colorWhite"></ImageView>
+                app:tint="@color/colorWhite"/>
         </FrameLayout>
 
     </LinearLayout>
@@ -160,7 +160,6 @@
             android:layout_width="@dimen/_22sdp"
             android:layout_height="@dimen/_22sdp"
             android:layout_marginStart="@dimen/_15sdp"
-            android:layout_marginLeft="@dimen/_15sdp"
             android:src="@drawable/ic_web_link"
             app:tint="@color/color_icons">
 
@@ -194,7 +193,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_10sdp"
-            android:layout_marginLeft="@dimen/_10sdp"
             android:fontFamily="@font/ubuntu_medium"
             android:includeFontPadding="false"
             android:text="Delete Note"

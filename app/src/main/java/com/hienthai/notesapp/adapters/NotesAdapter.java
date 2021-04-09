@@ -2,6 +2,7 @@ package com.hienthai.notesapp.adapters;
 
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.LayoutInflater;
@@ -74,8 +75,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
 
 
         if (note.getImagePath() != null) {
-            holder.imgItemNote.setImageBitmap(BitmapFactory.decodeFile(note.getImagePath()));
-
+            holder.imgItemNote.setImageURI(Uri.parse(note.getImagePath()));
 
             holder.imgItemNote.setVisibility(View.VISIBLE);
         } else {
@@ -83,12 +83,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
         }
 
 
-        holder.layoutItemNote.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                notesListener.onNoteClicked(note, position);
-            }
-        });
+        holder.layoutItemNote.setOnClickListener(v -> notesListener.onNoteClicked(note, position));
     }
 
     @Override

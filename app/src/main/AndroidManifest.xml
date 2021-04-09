@@ -3,7 +3,7 @@
     package="com.hienthai.notesapp">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
 
@@ -17,7 +17,7 @@
         <activity
             android:name=".activities.SaveNoteActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden"></activity>
+            android:windowSoftInputMode="stateHidden"/>
         <activity
             android:name=".activities.MainActivity"
             android:screenOrientation="portrait"

@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
 }
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 30
@@ -8,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "com.hienthai.notesapp"
-        minSdkVersion 16
+        minSdkVersion 17
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -25,6 +26,9 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    dataBinding {
+        enabled = true
     }
 }
 
@@ -53,5 +57,13 @@ dependencies {
 
     implementation 'com.squareup.picasso:picasso:2.71828'
 
+    implementation 'gun0912.ted:tedimagepicker:1.1.10'
+    implementation 'gun0912.ted:tedpermission:2.2.3'
+    implementation "androidx.core:core-ktx:+"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
+}
+repositories {
+    maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
+    mavenCentral()
 }
